@@ -477,7 +477,7 @@ export const SEED_BOOKS: SeedBook[] = [
 
   /* ───── 도덕교육 칸 ───── */
   { key: 'edu-stats', title: '학위논문 작성을 위한 교육연구 및 통계분석', authors: ['백순근'], category: 'other', publisher: '교육과학사', subjects: ['교육연구', '통계'], volumes: [{ title: '학위논문 작성을 위한 교육연구 및 통계분석', label: '수정판' }] },
-  { key: 'gibbs', title: '도덕 발달과 실제', subtitle: '콜버그, 호프만, 하이트 이론을 넘어서', authors: ['존 깁스'], translators: ['정창우', '이인태', '김윤경'], category: 'philosophy', publisher: '교육과학사', subjects: ['도덕심리학', '도덕교육'] },
+  { key: 'gibbs', title: '도덕 발달과 실재', subtitle: '콜버그, 호프만, 하이트 이론을 넘어서', authors: ['존 깁스'], translators: ['정창우', '이인태', '김윤경'], category: 'philosophy', publisher: '교육과학사', subjects: ['도덕심리학', '도덕교육'] },
   { key: 'moral-textbook', title: '도덕과 교재 연구 및 지도법', authors: ['정창우', '김혜진', '김하연', '이인태', '오유진', '이혜진'], category: 'philosophy', publisher: '교육과학사', subjects: ['도덕교육'] },
   { key: 'transformative-moral', title: '변혁적 도덕 역량 증진을 위한 도덕교육론', authors: ['정창우'], category: 'philosophy', publisher: '교육과학사', subjects: ['도덕교육'] },
   { key: 'empathy-studies', title: '공감학 어제와 오늘', authors: ['박성희'], category: 'philosophy', publisher: '학지사', subjects: ['공감', '상담'] },

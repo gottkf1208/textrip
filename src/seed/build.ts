@@ -1,9 +1,10 @@
+import { SEED_COVERS } from './covers';
 import { SCHEMA_VERSION, type ContextLink, type DataSet, type Edition, type Evidence, type LibraryEntry, type Place, type TemporalContext, type Work } from '../types';
 import { SEED_BOOKS, SEED_EVIDENCE, SEED_PLACES, type SeedTime } from './books';
 
 const T = '2026-11-02T00:00:00.000Z';
 /** 샘플 데이터를 고치면 올린다 → 기존 샘플 저장소에 덮어쓰기(메모는 유지) */
-export const SEED_VERSION = 3;
+export const SEED_VERSION = 4;
 const base = (id: string) => ({ id, createdAt: T, updatedAt: T, schemaVersion: SCHEMA_VERSION, deletedAt: null });
 
 /** 샘플 책장 → 데이터셋. ID는 고정이라 여러 번 불러도 같은 기록이 된다. */
@@ -52,7 +53,7 @@ export function buildSampleData(): DataSet {
         publisher: b.publisher ?? null,
         publishedDate: null,
         volumeLabel: v.label ?? null,
-        coverUrl: null,
+        coverUrl: i === 0 ? SEED_COVERS[b.key] ?? null : null,
         translators: b.translators ?? [],
         editionAuthors: v.authors,
         series: v.series ?? b.series ?? null,
