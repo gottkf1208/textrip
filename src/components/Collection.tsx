@@ -19,6 +19,8 @@ const TABS = [
   { id: 'passport', label: '독서 여권' },
 ] as const;
 type TabId = (typeof TABS)[number]['id'];
+/** 마스코트 ‘립이’ — 탭마다 다른 자세 */
+const MASCOT: Record<TabId, string> = { trunk: 'idle', postcards: 'postcard', pins: 'cheer', passport: 'stamp' };
 
 const abs = (p: string) => new URL(asset(p), document.baseURI).href;
 
@@ -100,6 +102,7 @@ export default function Collection({ tab }: { tab?: string }) {
         </div>
       </dl>
 
+      <div className="seg-row">
       <div className="seg" role="tablist" aria-label="수집함 종류" ref={segRef}>
         {pill && <span className="seg-pill" style={{ transform: `translateX(${pill.x}px)`, width: pill.w }} aria-hidden />}
         {TABS.map((t) => (
@@ -107,6 +110,8 @@ export default function Collection({ tab }: { tab?: string }) {
             {t.label} <span className="seg-n tnum">{counts[t.id]}</span>
           </button>
         ))}
+      </div>
+      <img key={active} className="mascot" src={asset(`collect/mascot/${MASCOT[active]}.webp`)} alt="" aria-hidden onError={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')} />
       </div>
 
       <div id="col-panel" role="tabpanel" className="col-panel" key={active}>
@@ -146,7 +151,7 @@ function Trunk({ owned, locked }: { owned: Sticker[]; locked: { placeId: string;
         'Stickers',
       );
   }, [owned, mode]);
-  const useArt = art && wide && owned.length + locked.length <= 48;
+  const useArt = art && wide && owned.length + locked.length <= 44;
 
   return (
     <section aria-label="여행 가방 스티커">
@@ -333,11 +338,8 @@ function PostcardItem({ c, flipped, onFlip }: { c: Postcard; flipped: boolean; o
             <span className="pc-face pc-front" ref={frontRef}>
               <span className="pc-sheet">
                 <span className="pc-art">
-                  {!bad && c.art ? (
-                    <img src={asset(c.art)} alt="" loading="lazy" decoding="async" onError={() => setBad(true)} />
-                  ) : (
-                    <Cover book={c.book} size="fill" className="pc-cover" />
-                  )}
+                  <Cover book={c.book} size="fill" className="pc-cover" />
+                  {!bad && c.art && <img className="pc-sticker" src={asset(c.art)} alt="" loading="lazy" decoding="async" onError={() => setBad(true)} />}
                 </span>
                 <span className="pc-text">
                   <span className="pc-greet">Greetings from</span>
@@ -478,7 +480,13 @@ function PinBoard({ pins }: { pins: ReturnType<typeof computePins> }) {
 function PinArt({ id, art }: { id: PinId; art: string }) {
   const ok = useAsset(art);
   const Icon = PIN_ICON[id];
-  if (ok) return <img className="pin-img" src={asset(art)} alt="" />;
+  if (ok)
+    return (
+      <>
+        <img className="pin-img" src={asset(art)} alt="" />
+        <span className="pin-shine" style={{ WebkitMaskImage: `url("${abs(art)}")`, maskImage: `url("${abs(art)}")` } as CSSProperties} aria-hidden />
+      </>
+    );
   return (
     <span className="pin-fallback" style={{ '--tone': PIN_TONE[id] } as CSSProperties}>
       <Icon size={30} strokeWidth={2} aria-hidden />
