@@ -26,6 +26,7 @@ export default function Passport({ missingContinents, countries, continents, old
   const { stamps } = useMemo(() => computeStamps(books, data), [books, data]);
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(0);
+  const [turn, setTurn] = useState<'next' | 'prev' | null>(null);
   const [sel, setSel] = useState<Stamp | null>(null);
   const [holder, setH] = useState(() => getHolder(mode === 'sample' ? '두목쿼카' : '여행자'));
   const [saving, setSaving] = useState(false);
@@ -42,6 +43,10 @@ export default function Passport({ missingContinents, countries, continents, old
 
   const items: Item[] = useMemo(() => [...stamps.map((s) => ({ kind: 'stamp' as const, s })), ...missingContinents.map((label) => ({ kind: 'locked' as const, label }))], [stamps, missingContinents]);
   const pages = Math.max(1, Math.ceil(items.length / PER));
+  const flip = (d: 1 | -1) => {
+    setTurn(d > 0 ? 'next' : 'prev');
+    setPage((p) => Math.min(pages - 1, Math.max(0, p + d)));
+  };
   const cur = items.slice(page * PER, page * PER + PER);
   const years = cur.flatMap((it) => (it.kind === 'stamp' && it.s.year != null ? [it.s.year] : []));
 
@@ -186,7 +191,7 @@ export default function Passport({ missingContinents, countries, continents, old
             <span>입국 기록 · VISAS</span>
             <span className="tnum">{years.length ? `${formatStampYear(Math.min(...years))} — ${formatStampYear(Math.max(...years))}` : ''}</span>
           </div>
-          <ul className="stamp-grid" key={page}>
+          <ul className={`stamp-grid${turn ? ` turn-${turn}` : ''}`} key={page}>
             {cur.map((it, i) =>
               it.kind === 'stamp' ? (
                 <li key={it.s.id}>
@@ -210,13 +215,13 @@ export default function Passport({ missingContinents, countries, continents, old
             )}
           </ul>
           <div className="pp-foot">
-            <button type="button" className="pp-nav" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={page === 0} aria-label="이전 면">
+            <button type="button" className="pp-nav" onClick={() => flip(-1)} disabled={page === 0} aria-label="이전 면">
               ‹
             </button>
             <span className="tnum">
               {page + 1} / {pages}
             </span>
-            <button type="button" className="pp-nav" onClick={() => setPage((p) => Math.min(pages - 1, p + 1))} disabled={page >= pages - 1} aria-label="다음 면">
+            <button type="button" className="pp-nav" onClick={() => flip(1)} disabled={page >= pages - 1} aria-label="다음 면">
               ›
             </button>
           </div>
@@ -234,7 +239,7 @@ export default function Passport({ missingContinents, countries, continents, old
               {sel.books.map((b) => (
                 <li key={b.workId}>
                   <a className="arrow-link" href={hrefFor({ name: 'book', bookId: b.workId, linkId: b.linkId })}>
-                    {b.title} <span className="arrow" aria-hidden>→</span>
+                    {b.title} <span className="arrow swap" aria-hidden><span>→</span><span>→</span></span>
                   </a>
                 </li>
               ))}

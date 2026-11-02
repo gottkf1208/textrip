@@ -31,6 +31,7 @@ export default function MapView(p: Props) {
   const box = useRef<HTMLDivElement>(null);
   const map = useRef<MLMap | null>(null);
   const markers = useRef(new Map<string, { marker: Marker; el: HTMLButtonElement }>());
+  const dropIdx = useRef(0);
   const ML = useRef<typeof import('maplibre-gl') | null>(null);
   const [status, setStatus] = useState<Status>('loading');
   const props = useRef(p);
@@ -139,6 +140,13 @@ export default function MapView(p: Props) {
         });
         const marker = new mod.Marker({ element: el, anchor: 'bottom' }).setLngLat(lngLat).addTo(m);
         rec = { marker, el };
+        // 핀이 처음 생길 때 위에서 톡 떨어져 자리 잡아요 (쿼카 모션랩 photo-drop의 낙하·안착 원리)
+        if (!props.current.reduceMotion) {
+          const k = Math.min(dropIdx.current++, 24);
+          el.style.setProperty('--dd', `${k * 45}ms`);
+          el.classList.add('drop-in');
+          window.setTimeout(() => el.classList.remove('drop-in'), 900 + k * 45);
+        }
         markers.current.set(key, rec);
       }
       (rec.el as HTMLButtonElement & { _go?: () => void })._go = onClick;

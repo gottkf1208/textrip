@@ -1,6 +1,9 @@
+import { useRef, useState } from 'react';
 import { Plus, Settings as SettingsIcon } from 'lucide-react';
 import { useStore } from './store';
-import { useRoute } from './lib/util';
+import { useRoute, type Route } from './lib/util';
+import { useReveal } from './lib/motion';
+import Collection from './components/Collection';
 import MapWorkspace from './components/MapWorkspace';
 import Library from './components/Library';
 import AddBook from './components/AddBook';
@@ -13,6 +16,7 @@ export default function App() {
   const { mode, switchMode, copySampleToUser, books, error, ready } = useStore();
   const toast = useToast();
   const onMap = route.name === 'map' || route.name === 'book' || route.name === 'course';
+  useReveal();
 
   return (
     <div className={`app${mode === 'sample' ? ' has-sample' : ''}${onMap ? ' map-page' : ''}`}>
@@ -22,11 +26,7 @@ export default function App() {
           <a className="wordmark" href="#/">
             <img src={`${import.meta.env.BASE_URL}brand/textrip-wordmark.svg`} alt="TEXTRIP" width={115} height={20} />
           </a>
-          <nav className="nav" aria-label="주 메뉴">
-            <a href="#/" aria-current={onMap ? 'page' : undefined}>나의 지도</a>
-            <a href="#/library" aria-current={route.name === 'library' ? 'page' : undefined}>내 책장</a>
-            <a href="#/conquest" aria-current={route.name === 'conquest' ? 'page' : undefined}>세계정복</a>
-          </nav>
+          <NavLinks route={route} onMap={onMap} className="nav" follow />
           <span className="header-spacer" />
           <a className="action primary small" href="#/add" style={{ minHeight: 40 }}>
             <Plus size={18} aria-hidden />
@@ -37,11 +37,7 @@ export default function App() {
             <SettingsIcon size={20} aria-hidden />
           </a>
         </div>
-        <nav className="nav-mobile" aria-label="주 메뉴">
-          <a href="#/" aria-current={onMap ? 'page' : undefined}>나의 지도</a>
-          <a href="#/library" aria-current={route.name === 'library' ? 'page' : undefined}>내 책장</a>
-          <a href="#/conquest" aria-current={route.name === 'conquest' ? 'page' : undefined}>세계정복</a>
-        </nav>
+        <NavLinks route={route} onMap={onMap} className="nav-mobile" />
         {mode === 'sample' && (
           <div className="sample-bar" role="note">
             <span>
@@ -71,7 +67,32 @@ export default function App() {
         {route.name === 'add' && <AddBook key={location.hash} />}
         {route.name === 'settings' && <Settings />}
         {ready && route.name === 'conquest' && <Conquest />}
+        {ready && route.name === 'collection' && <Collection tab={route.tab} />}
       </main>
     </div>
+  );
+}
+
+const LINKS: { href: string; label: string; is: (r: Route, onMap: boolean) => boolean }[] = [
+  { href: '#/', label: '나의 지도', is: (_r, m) => m },
+  { href: '#/library', label: '내 책장', is: (r) => r.name === 'library' },
+  { href: '#/collection', label: '수집함', is: (r) => r.name === 'collection' },
+  { href: '#/conquest', label: '세계정복', is: (r) => r.name === 'conquest' },
+];
+
+/** 따라오는 칸(쿼카 모션랩 lp-nav-hover-follow): 메뉴 위에 커서를 올리면 옅은 칸이 미끄러져 따라가요 */
+function NavLinks({ route, onMap, className, follow }: { route: Route; onMap: boolean; className: string; follow?: boolean }) {
+  const ref = useRef<HTMLElement>(null);
+  const [pill, setPill] = useState<{ x: number; w: number; on: boolean }>({ x: 0, w: 0, on: false });
+  const move = (el: HTMLElement) => setPill({ x: el.offsetLeft, w: el.offsetWidth, on: true });
+  return (
+    <nav ref={ref} className={className} aria-label="주 메뉴" onMouseLeave={follow ? () => setPill((p) => ({ ...p, on: false })) : undefined}>
+      {follow && <span className={`nav-pill${pill.on ? ' on' : ''}`} style={{ transform: `translateX(${pill.x}px)`, width: pill.w }} aria-hidden />}
+      {LINKS.map((l) => (
+        <a key={l.href} href={l.href} aria-current={l.is(route, onMap) ? 'page' : undefined} onMouseEnter={follow ? (e) => move(e.currentTarget) : undefined} onFocus={follow ? (e) => move(e.currentTarget) : undefined}>
+          {l.label}
+        </a>
+      ))}
+    </nav>
   );
 }

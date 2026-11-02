@@ -231,7 +231,7 @@ export default function MapWorkspace({ route }: { route: Route }) {
               책으로 정복한 나라 <strong className="tnum">{conquest.countries.length}</strong>곳 · 대륙 {conquest.continents.size}/6
             </span>
             <a className="arrow-link" href="#/conquest" style={{ minHeight: 32 }}>
-              현황 <span className="arrow" aria-hidden>→</span>
+              현황 <span className="arrow swap" aria-hidden><span>→</span><span>→</span></span>
             </a>
           </div>
         )}
@@ -424,7 +424,7 @@ function CoursePanel({ course, index, onStep, onClose, onOpenBook, hideClose }: 
             다음 정복지
           </button>
           <button type="button" className="arrow-link" style={{ marginLeft: 4 }} onClick={() => onOpenBook(st.book.work.id, st.link.id)}>
-            책 열기 <span className="arrow" aria-hidden>→</span>
+            책 열기 <span className="arrow swap" aria-hidden><span>→</span><span>→</span></span>
           </button>
         </div>
       </section>

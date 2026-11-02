@@ -2,12 +2,14 @@ import { useMemo } from 'react';
 import { useStore } from '../store';
 import { computeConquest, formatYear } from '../lib/conquest';
 import { hrefFor } from '../lib/util';
-import Passport from './Passport';
+import { CountUp } from '../lib/motion';
+import { computeStickers } from '../lib/collection';
 
 export default function Conquest() {
   const { books, data } = useStore();
   const c = useMemo(() => computeConquest(books, data), [books, data]);
   const earned = c.titles.filter((t) => t.earned);
+  const st = useMemo(() => computeStickers(books, data), [books, data]);
 
   return (
     <div className="page conquest">
@@ -17,21 +19,23 @@ export default function Conquest() {
       </h1>
       <p className="lede">내 책장에 기록한 장소와 시대만으로 계산해요. 아직 근거를 확인하지 않은 연결도 정복지에 포함되니, 상세에서 근거 상태를 함께 봐 주세요.</p>
 
-      <Passport missingContinents={c.missingContinents} countries={c.countries.length} continents={c.continents.size} oldest={c.oldest} newest={c.newest} />
-
-      <dl className="stat-grid">
+      <dl className="stat-grid" data-reveal>
         <div>
           <dt>나라</dt>
-          <dd className="tnum">{c.countries.length}</dd>
+          <dd>
+            <CountUp value={c.countries.length} delay={450} />
+          </dd>
         </div>
         <div>
           <dt>도시·장소</dt>
-          <dd className="tnum">{c.cityCount}</dd>
+          <dd>
+            <CountUp value={c.cityCount} delay={570} />
+          </dd>
         </div>
         <div>
           <dt>대륙</dt>
-          <dd className="tnum">
-            {c.continents.size}
+          <dd>
+            <CountUp value={c.continents.size} delay={690} />
             <small>/6</small>
           </dd>
         </div>
@@ -42,6 +46,24 @@ export default function Conquest() {
           </dd>
         </div>
       </dl>
+      <a className="collect-banner" href="#/collection" data-reveal>
+        <span className="cb-stickers" aria-hidden>
+          {st.owned.slice(0, 5).map((x, i) => (
+            <span key={x.id} className={`cb-dot r-${x.rarity}`} style={{ rotate: `${x.rot}deg`, zIndex: 5 - i }}>
+              {x.name.slice(0, 1)}
+            </span>
+          ))}
+        </span>
+        <span className="cb-text">
+          <b className="ko">여행 가방에 스티커 {st.owned.length}개</b>
+          <span className="meta ko">수집함에서 스티커·엽서·핀·여권 도장을 모아 봐요</span>
+        </span>
+        <span className="arrow swap" aria-hidden>
+          <span>→</span>
+          <span>→</span>
+        </span>
+      </a>
+
       <div className="actions" style={{ margin: '20px 0 8px' }}>
         <a className="action primary" href="#/?layer=conquest">
           정복 지도로 보기
@@ -56,7 +78,7 @@ export default function Conquest() {
       <h2 className="section-title">정복한 나라</h2>
       <ol className="country-list">
         {c.countries.map((x, i) => (
-          <li key={x.code}>
+          <li key={x.code} data-reveal>
             <span className="rank tnum">{String(i + 1).padStart(2, '0')}</span>
             <span className="ko name">{x.name}</span>
             <span className="meta">{x.continent ?? ''}</span>
@@ -81,7 +103,7 @@ export default function Conquest() {
       </p>
       <div className="grid-2">
         {c.courses.map((course) => (
-          <article key={course.id} className="card course-card">
+          <article key={course.id} className="card course-card" data-reveal>
             <div className="eyebrow">{{ city: '도시 원정', era: '시대 원정', thinker: '사상가 루트', fictional: '가상 장소 순례' }[course.kind]}</div>
             <h3 className="ko">{course.title}</h3>
             <p className="meta">{course.subtitle}</p>
@@ -95,7 +117,7 @@ export default function Conquest() {
               {course.steps.length > 4 && <li className="meta">외 {course.steps.length - 4}권</li>}
             </ol>
             <a className="arrow-link" href={hrefFor({ name: 'course', courseId: course.id })}>
-              지도에서 원정 시작 <span className="arrow" aria-hidden>→</span>
+              지도에서 원정 시작 <span className="arrow swap" aria-hidden><span>→</span><span>→</span></span>
             </a>
           </article>
         ))}
@@ -103,11 +125,11 @@ export default function Conquest() {
 
       <h2 className="section-title">칭호</h2>
       <p className="help" style={{ marginTop: -6, marginBottom: 12 }}>
-        {earned.length}개 획득 · 기록이 쌓이면 잠긴 칭호가 열려요.
+        {earned.length}개 획득 · 기록이 쌓이면 잠긴 칭호가 열려요. <a href="#/collection?tab=pins">핀 배지로 보기</a>
       </p>
       <ul className="title-list">
         {c.titles.map((t) => (
-          <li key={t.name} className={t.earned ? 'earned' : 'locked'}>
+          <li key={t.name} className={t.earned ? 'earned' : 'locked'} data-reveal>
             <span className="t ko">{t.name}</span>
             <span className="meta ko">{t.earned ? t.why : `조건 · ${t.why}`}</span>
           </li>

@@ -107,26 +107,26 @@ export function setHolder(v: string) {
   }
 }
 
-const SEEN_KEY = (mode: string) => `textrip.seenStamps.${mode}`;
-export function getSeen(mode: string): Set<string> | null {
+const SEEN_KEY = (mode: string, kind = 'Stamps') => `textrip.seen${kind}.${mode}`;
+export function getSeen(mode: string, kind?: string): Set<string> | null {
   try {
-    const v = localStorage.getItem(SEEN_KEY(mode));
+    const v = localStorage.getItem(SEEN_KEY(mode, kind));
     return v ? new Set(JSON.parse(v)) : null;
   } catch {
     return null;
   }
 }
-export function setSeen(mode: string, ids: string[]) {
+export function setSeen(mode: string, ids: string[], kind?: string) {
   try {
-    localStorage.setItem(SEEN_KEY(mode), JSON.stringify(ids));
+    localStorage.setItem(SEEN_KEY(mode, kind), JSON.stringify(ids));
   } catch {
     /* noop */
   }
 }
 
-export async function saveNodeAsImage(node: HTMLElement, filename: string, bg = '#ffffff') {
+export async function saveNodeAsImage(node: HTMLElement, filename: string, bg = '#ffffff', style?: Partial<CSSStyleDeclaration>) {
   const { toPng } = await import('html-to-image');
-  const url = await toPng(node, { pixelRatio: 2, backgroundColor: bg, cacheBust: true });
+  const url = await toPng(node, { pixelRatio: 2, backgroundColor: bg, cacheBust: true, style });
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;

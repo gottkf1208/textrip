@@ -332,7 +332,7 @@ function Evidence({ ids, evidence, status }: { ids: string[]; evidence: Map<stri
   return (
     <details>
       <summary className="arrow-link" style={{ listStyle: 'none' }}>
-        근거 {list.length}개 보기 <span className="arrow" aria-hidden>→</span>
+        근거 {list.length}개 보기 <span className="arrow swap" aria-hidden><span>→</span><span>→</span></span>
       </summary>
       <ul className="evidence-list">
         {list.map((e) => (

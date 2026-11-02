@@ -70,7 +70,8 @@ export function useLayout() {
 
 /* ───── 해시 라우터 ───── */
 export interface Route {
-  name: 'map' | 'library' | 'book' | 'add' | 'settings' | 'conquest' | 'course';
+  name: 'map' | 'library' | 'book' | 'add' | 'settings' | 'conquest' | 'course' | 'collection';
+  tab?: string;
   bookId?: string;
   linkId?: string;
   courseId?: string;
@@ -85,6 +86,7 @@ export function parseHash(h: string): Route {
   if (parts[0] === 'add') return { name: 'add' };
   if (parts[0] === 'settings') return { name: 'settings' };
   if (parts[0] === 'conquest') return { name: 'conquest' };
+  if (parts[0] === 'collection') return { name: 'collection', tab: q.get('tab') ?? undefined };
   if (parts[0] === 'course' && parts[1]) return { name: 'course', courseId: decodeURIComponent(parts[1]) };
   if (parts[0] === 'books' && parts[1]) return { name: 'book', bookId: decodeURIComponent(parts[1]), linkId: q.get('link') ?? undefined };
   return { name: 'map', layer: q.get('layer') ?? undefined };
@@ -95,6 +97,7 @@ export function hrefFor(r: Route) {
   if (r.name === 'add') return '#/add';
   if (r.name === 'settings') return '#/settings';
   if (r.name === 'conquest') return '#/conquest';
+  if (r.name === 'collection') return `#/collection${r.tab ? `?tab=${r.tab}` : ''}`;
   if (r.name === 'course' && r.courseId) return `#/course/${encodeURIComponent(r.courseId)}`;
   if (r.name === 'book' && r.bookId) return `#/books/${encodeURIComponent(r.bookId)}${r.linkId ? `?link=${encodeURIComponent(r.linkId)}` : ''}`;
   return '#/';
