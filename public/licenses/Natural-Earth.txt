@@ -1,0 +1,13 @@
+Natural Earth - Public Domain
+
+Dataset: ne_110m_land, 1:110m physical land polygons.
+Snapshot: natural-earth-vector v5.1.2.
+https://github.com/nvkelso/natural-earth-vector/tree/v5.1.2
+https://www.naturalearthdata.com/downloads/110m-physical-vectors/110m-land/
+https://www.naturalearthdata.com/about/terms-of-use/
+
+Natural Earth publishes its raster and vector map data in the public domain.
+The geometry is projected and cropped for the TEXTRIP OG image. The resulting
+SVG contains coastlines only. No administrative borders or claims are added.
+
+Made with Natural Earth.

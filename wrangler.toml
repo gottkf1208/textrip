@@ -1,0 +1,9 @@
+# 선택: 서버에 키를 두고 쓰는 배포 (Cloudflare Workers)
+name = "textrip"
+main = "worker/index.ts"
+compatibility_date = "2025-06-01"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
