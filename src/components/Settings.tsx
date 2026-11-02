@@ -124,7 +124,7 @@ export default function Settings() {
             <div className="grid-2" style={{ marginTop: 12 }}>
               <label className="field">
                 <span>Claude API 키</span>
-                <input className="input" type="password" autoComplete="off" value={key} onChange={(e) => setKey(e.target.value)} placeholder={hasKey ? '저장된 키가 있어요 · 바꾸려면 새로 입력' : 'sk-ant-…'} />
+                <input className="input" type="password" name="textrip-claude-api-key" autoComplete="new-password" spellCheck={false} data-lpignore="true" data-1p-ignore="true" value={key} onChange={(e) => setKey(e.target.value)} placeholder={hasKey ? '저장된 키가 있어요 · 바꾸려면 새로 입력' : 'sk-ant-…'} />
               </label>
               <label className="field">
                 <span>모델</span>
