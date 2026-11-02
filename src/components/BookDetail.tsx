@@ -19,6 +19,8 @@ import { Ico } from './Ico';
 import MemoEditor from './MemoEditor';
 import { useToast } from './Toast';
 import LinkReview from './LinkReview';
+import BoardingPass from './BoardingPass';
+import { go } from '../lib/util';
 
 interface Props {
   book: BookView;
@@ -42,6 +44,7 @@ export default function BookDetail({ book, selectedLinkId, onSelectLink, onClose
   const isPhilosophy = work.category === 'philosophy';
   const [tab, setTab] = useState<'book' | 'place'>('book');
   const [showReview, setShowReview] = useState(false);
+  const [showPass, setShowPass] = useState(false);
   const titleRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
@@ -109,6 +112,26 @@ export default function BookDetail({ book, selectedLinkId, onSelectLink, onClose
         {editions[0]?.publisher && <span className="meta meta-item">{editions[0].publisher}</span>}
         {editions[0]?.series && <span className="meta meta-item">{editions[0].series}</span>}
       </div>
+      <div className="actions" style={{ margin: '10px 0 4px' }}>
+        <button type="button" className="action small bp-open" onClick={() => setShowPass(true)}>
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden fill="none" stroke="currentColor" strokeWidth="1.6">
+            <path d="M3 7h18v3a2 2 0 0 0 0 4v3H3v-3a2 2 0 0 0 0-4z" />
+            <path d="M15 7v10" strokeDasharray="1.6 1.8" />
+          </svg>
+          탑승권 받기
+        </button>
+      </div>
+      {showPass && (
+        <BoardingPass
+          book={book}
+          link={link}
+          onClose={() => setShowPass(false)}
+          onBoard={(id) => {
+            setShowPass(false);
+            onSelectLink(id, true);
+          }}
+        />
+      )}
       {review && (
         <p className="notice" role="note">
           <span aria-hidden>!</span>
@@ -251,7 +274,15 @@ export default function BookDetail({ book, selectedLinkId, onSelectLink, onClose
             책 삭제
           </button>
         </div>
-        {showReview && <LinkReview book={book} onAdded={(id) => onSelectLink(id, true)} />}
+        {showReview && (
+          <LinkReview
+            book={book}
+            onAdded={(id) => {
+              onSelectLink(id, true);
+              toast({ message: '쾅! 독서 여권에 입국 도장이 찍혔어요', actionLabel: '여권 보기', onAction: () => go({ name: 'conquest' }) });
+            }}
+          />
+        )}
       </section>
     </article>
   );
