@@ -34,7 +34,8 @@ bbox는 사진 왼쪽 위를 (0,0), 오른쪽 아래를 (1,1)로 하는 정규�
 export function buildClaudeRequest(base64Jpeg: string, model = DEFAULT_MODEL) {
   return {
     model,
-    max_tokens: 4096,
+    // 책이 많은 사진은 결과 JSON이 길고, 모델이 먼저 생각하는 토큰도 이 한도 안에서 쓴다
+    max_tokens: 16000,
     system: SYSTEM_PROMPT,
     messages: [
       {
@@ -50,19 +51,58 @@ export function buildClaudeRequest(base64Jpeg: string, model = DEFAULT_MODEL) {
 
 const str = (v: unknown, max = 300) => (typeof v === 'string' ? v.replace(/\s+/g, ' ').trim().slice(0, max) : '');
 
+/** 잘린 JSON에서 "books" 배열의 완결된 객체만 꺼낸다 */
+export function salvageBooks(text: string): unknown[] | null {
+  const key = text.indexOf('"books"');
+  if (key < 0) return null;
+  const open = text.indexOf('[', key);
+  if (open < 0) return null;
+  const out: unknown[] = [];
+  let depth = 0;
+  let start = -1;
+  let inStr = false;
+  let esc = false;
+  for (let k = open + 1; k < text.length; k++) {
+    const ch = text[k];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (ch === '\\') esc = true;
+      else if (ch === '"') inStr = false;
+      continue;
+    }
+    if (ch === '"') inStr = true;
+    else if (ch === '{') {
+      if (depth === 0) start = k;
+      depth++;
+    } else if (ch === '}') {
+      depth--;
+      if (depth === 0 && start >= 0) {
+        try {
+          out.push(JSON.parse(text.slice(start, k + 1)));
+        } catch {
+          /* 깨진 항목은 건너뛴다 */
+        }
+        start = -1;
+      }
+    } else if (ch === ']' && depth === 0) break;
+  }
+  return out.length ? out : null;
+}
+
 /** Claude 응답(JSON 텍스트) → 검증된 후보. 형식이 틀리면 throw */
 export function parseCandidates(text: string, imageId: string): Candidate[] {
   const cleaned = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '');
   const start = cleaned.indexOf('{');
   const end = cleaned.lastIndexOf('}');
   if (start < 0 || end < start) throw new Error('인식 결과 형식을 읽지 못했어요.');
-  let parsed: unknown;
+  let books: unknown;
   try {
-    parsed = JSON.parse(cleaned.slice(start, end + 1));
+    books = (JSON.parse(cleaned.slice(start, end + 1)) as { books?: unknown }).books;
   } catch {
-    throw new Error('인식 결과 형식을 읽지 못했어요.');
+    // 응답이 길이 한도에서 잘린 경우: 끝까지 닫힌 책 항목만 살린다
+    books = salvageBooks(cleaned);
+    if (!books) throw new Error('인식 결과 형식을 읽지 못했어요.');
   }
-  const books = (parsed as { books?: unknown }).books;
   if (!Array.isArray(books)) throw new Error('인식 결과에 책 목록이 없어요.');
   const out: Candidate[] = [];
   books.slice(0, 80).forEach((b, i) => {

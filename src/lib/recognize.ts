@@ -126,7 +126,15 @@ async function once(provider: Provider, imageId: string, base64: string, signal:
     if (!Array.isArray(c)) throw new RecognitionError('분석 결과 형식이 맞지 않아요.');
     return c;
   }
-  return parseCandidates(textFromClaude(json), imageId);
+  const j = json as { stop_reason?: string };
+  try {
+    return parseCandidates(textFromClaude(json), imageId);
+  } catch {
+    throw new RecognitionError(
+      j.stop_reason === 'max_tokens' ? '사진 속 책이 너무 많아 결과가 잘렸어요. 사진을 두세 부분으로 잘라서 다시 시도해 주세요.' : '분석 결과를 읽지 못했어요. 다시 시도해 주세요.',
+      j.stop_reason !== 'max_tokens',
+    );
+  }
 }
 
 /** 네트워크·429·일시적 서버 오류는 최대 2회 지연 재시도 */
