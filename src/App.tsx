@@ -4,6 +4,7 @@ import { useStore } from './store';
 import { useRoute, type Route } from './lib/util';
 import { useReveal } from './lib/motion';
 import Collection from './components/Collection';
+import PhoneQR from './components/PhoneQR';
 import MapWorkspace from './components/MapWorkspace';
 import Library from './components/Library';
 import AddBook from './components/AddBook';
@@ -28,6 +29,7 @@ export default function App() {
           </a>
           <NavLinks route={route} onMap={onMap} className="nav" follow />
           <span className="header-spacer" />
+          <PhoneQR sample={mode === 'sample'} />
           <a className="action primary small" href="#/add" style={{ minHeight: 40 }}>
             <Plus size={18} aria-hidden />
             <span className="add-label-long">읽은 책 추가</span>

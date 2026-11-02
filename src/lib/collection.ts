@@ -48,6 +48,7 @@ export function computeStickers(books: BookView[], data: DataSet) {
 }
 
 export interface Postcard {
+  book: BookView;
   workId: string;
   linkId: string;
   title: string;
@@ -73,6 +74,7 @@ export function computePostcards(books: BookView[], data: DataSet): Postcard[] {
     const note = data.notes.find((n) => n.libraryEntryId === b.entry.id && n.scope === 'book' && !n.deletedAt);
     const d = new Date(b.entry.completedAt || b.entry.addedAt);
     out.push({
+      book: b,
       workId: b.work.id,
       linkId: l.id,
       title: b.work.canonicalTitle,

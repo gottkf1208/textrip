@@ -242,6 +242,7 @@ export default function AddBook() {
         publisher: r.publisher,
         publishedDate: r.publishedDate,
         coverUrl: r.coverUrl,
+        spineImage: r.thumb ?? null,
         category: r.category,
         source: r.source,
         attachToWorkId: d && r.dupChoice === 'attach' ? d.workId : null,

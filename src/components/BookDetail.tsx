@@ -20,6 +20,7 @@ import MemoEditor from './MemoEditor';
 import { useToast } from './Toast';
 import LinkReview from './LinkReview';
 import BoardingPass from './BoardingPass';
+import { Cover, findCovers, setCover } from '../lib/covers';
 import { go } from '../lib/util';
 
 interface Props {
@@ -45,6 +46,7 @@ export default function BookDetail({ book, selectedLinkId, onSelectLink, onClose
   const [tab, setTab] = useState<'book' | 'place'>('book');
   const [showReview, setShowReview] = useState(false);
   const [showPass, setShowPass] = useState(false);
+  const [pickCover, setPickCover] = useState(false);
   const titleRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
@@ -92,6 +94,9 @@ export default function BookDetail({ book, selectedLinkId, onSelectLink, onClose
   return (
     <article className="detail" aria-labelledby={`t-${work.id}`}>
       <div className="detail-top">
+        <button type="button" className="cover-btn" onClick={() => setPickCover((v) => !v)} aria-expanded={pickCover} aria-label="표지 바꾸기">
+          <Cover book={book} size="m" />
+        </button>
         <div className="layout-child">
           <div className="eyebrow">{CATEGORY_LABEL[work.category]}</div>
           <h2 id={`t-${work.id}`} ref={titleRef} className="book-title" tabIndex={-1}>
@@ -120,7 +125,11 @@ export default function BookDetail({ book, selectedLinkId, onSelectLink, onClose
           </svg>
           탑승권 받기
         </button>
+        <button type="button" className="action small ghost" onClick={() => setPickCover((v) => !v)} aria-expanded={pickCover}>
+          표지 바꾸기
+        </button>
       </div>
+      {pickCover && <CoverPicker book={book} onDone={() => setPickCover(false)} />}
       {showPass && (
         <BoardingPass
           book={book}
@@ -346,5 +355,65 @@ function Evidence({ ids, evidence, status }: { ids: string[]; evidence: Map<stri
         ))}
       </ul>
     </details>
+  );
+}
+
+function CoverPicker({ book, onDone }: { book: BookView; onDone: () => void }) {
+  const [hits, setHits] = useState<{ url: string; title: string }[] | null>(null);
+  const [err, setErr] = useState('');
+  useEffect(() => {
+    const ctl = new AbortController();
+    const title = book.work.canonicalTitle;
+    const author = book.work.authors[0] ?? null;
+    (async () => {
+      try {
+        let h = await findCovers(title, author, ctl.signal);
+        if (h.length < 4 && author) {
+          const more = await findCovers(title, null, ctl.signal);
+          h = [...h, ...more.filter((x) => !h.some((y) => y.url === x.url))];
+        }
+        setHits(h.slice(0, 11));
+      } catch {
+        if (!ctl.signal.aborted) setErr('표지를 찾지 못했어요. 잠시 뒤 다시 시도해 주세요.');
+      }
+    })();
+    return () => ctl.abort();
+  }, [book.work.id, book.work.canonicalTitle, book.work.authors]);
+  return (
+    <section className="cover-picker" aria-label="표지 고르기">
+      <p className="meta prose">내 책과 같은 표지를 골라 주세요. 고른 표지는 이 기기에 기억해요.</p>
+      {err && <p className="meta">{err}</p>}
+      {!err && hits === null && <p className="meta">표지를 찾는 중…</p>}
+      {hits && !hits.length && <p className="meta prose">지금은 표지를 자동으로 찾지 못했어요. 잠시 뒤 다시 열어 보세요.</p>}
+      {hits && (
+        <ul className="cover-grid">
+          {hits.map((h) => (
+            <li key={h.url}>
+              <button
+                type="button"
+                onClick={() => {
+                  setCover(book.work.id, h.url);
+                  onDone();
+                }}
+              >
+                <img src={h.url} alt={h.title} loading="lazy" referrerPolicy="no-referrer" />
+              </button>
+            </li>
+          ))}
+          <li>
+            <button
+              type="button"
+              className="cover-none"
+              onClick={() => {
+                setCover(book.work.id, null);
+                onDone();
+              }}
+            >
+              글자 표지로
+            </button>
+          </li>
+        </ul>
+      )}
+    </section>
   );
 }

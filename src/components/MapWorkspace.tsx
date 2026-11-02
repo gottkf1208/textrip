@@ -1,3 +1,4 @@
+import { Cover } from '../lib/covers';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { List, Map as MapIcon, SlidersHorizontal, X, ChevronLeft, Flag } from 'lucide-react';
 import { useStore } from '../store';
@@ -363,10 +364,13 @@ function PlaceSummary({ group, onOpenBook, onClose, dark, hideClose }: { group: 
       <ul className="book-links" style={{ marginTop: 8 }}>
         {group.items.map(({ book, link }) => (
           <li key={link.id} style={{ borderTop: `1px solid ${dark ? 'var(--panel-line)' : 'var(--line)'}` }}>
-            <button type="button" onClick={() => onOpenBook(book.work.id, link.id)}>
-              <span className="t book-title">{book.work.canonicalTitle}</span>
-              <span className="s" style={dark ? { color: 'var(--panel-secondary)' } : undefined}>
-                {RELATION_LABEL[link.relationType]} · {VERIFICATION_LABEL[link.verificationStatus]}
+            <button type="button" className="has-cover" onClick={() => onOpenBook(book.work.id, link.id)}>
+              <Cover book={book} size="xs" />
+              <span className="bl-text">
+                <span className="t book-title">{book.work.canonicalTitle}</span>
+                <span className="s" style={dark ? { color: 'var(--panel-secondary)' } : undefined}>
+                  {RELATION_LABEL[link.relationType]} · {VERIFICATION_LABEL[link.verificationStatus]}
+                </span>
               </span>
             </button>
           </li>

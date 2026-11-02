@@ -1,3 +1,4 @@
+import { Cover } from '../lib/covers';
 import type { PlaceGroup } from '../lib/selectors';
 import type { BookView } from '../store';
 import { PRECISION_LABEL, RELATION_LABEL } from '../types';
@@ -41,10 +42,13 @@ export default function PlaceList({ groups, unmapped, workCount, onOpenBook, onS
           <ul className="book-links">
             {g.items.map(({ book, link }) => (
               <li key={link.id}>
-                <button type="button" onClick={() => onOpenBook(book.work.id, link.id)}>
-                  <span className="t book-title">{book.work.canonicalTitle}</span>
-                  <span className="s">
-                    {formatAuthors(book.work.authors)} · {RELATION_LABEL[link.relationType]}
+                <button type="button" className="has-cover" onClick={() => onOpenBook(book.work.id, link.id)}>
+                  <Cover book={book} size="xs" />
+                  <span className="bl-text">
+                    <span className="t book-title">{book.work.canonicalTitle}</span>
+                    <span className="s">
+                      {formatAuthors(book.work.authors)} · {RELATION_LABEL[link.relationType]}
+                    </span>
                   </span>
                 </button>
               </li>
@@ -60,9 +64,12 @@ export default function PlaceList({ groups, unmapped, workCount, onOpenBook, onS
           <ul className="book-links">
             {unmapped.map((b) => (
               <li key={b.work.id}>
-                <button type="button" onClick={() => onOpenBook(b.work.id)}>
-                  <span className="t book-title">{b.work.canonicalTitle}</span>
-                  <span className="s">{formatAuthors(b.work.authors)}</span>
+                <button type="button" className="has-cover" onClick={() => onOpenBook(b.work.id)}>
+                  <Cover book={b} size="xs" />
+                  <span className="bl-text">
+                    <span className="t book-title">{b.work.canonicalTitle}</span>
+                    <span className="s">{formatAuthors(b.work.authors)}</span>
+                  </span>
                 </button>
               </li>
             ))}

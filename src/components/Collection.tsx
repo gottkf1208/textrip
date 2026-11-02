@@ -7,6 +7,7 @@ import { computeConquest } from '../lib/conquest';
 import { computeStamps, formatStampYear, getSeen, saveNodeAsImage, setSeen } from '../lib/passport';
 import { go, hrefFor, useMediaQuery, useReducedMotion } from '../lib/util';
 import { CountUp, tilt } from '../lib/motion';
+import { Cover } from '../lib/covers';
 import { asset } from './Ico';
 import Passport from './Passport';
 import { useToast } from './Toast';
@@ -335,9 +336,7 @@ function PostcardItem({ c, flipped, onFlip }: { c: Postcard; flipped: boolean; o
                   {!bad && c.art ? (
                     <img src={asset(c.art)} alt="" loading="lazy" decoding="async" onError={() => setBad(true)} />
                   ) : (
-                    <span className="pc-art-fallback" aria-hidden>
-                      {c.place.displayName.slice(0, 1)}
-                    </span>
+                    <Cover book={c.book} size="fill" className="pc-cover" />
                   )}
                 </span>
                 <span className="pc-text">

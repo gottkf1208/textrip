@@ -1,3 +1,4 @@
+import { Cover } from '../lib/covers';
 import { useMemo, useState } from 'react';
 import { useStore } from '../store';
 import { CATEGORY_LABEL, type Category } from '../types';
@@ -72,6 +73,7 @@ export default function Library() {
       <div>
         {rows.map(({ b, st }) => (
           <a key={b.work.id} className="library-row" data-reveal href={hrefFor({ name: 'book', bookId: b.work.id })}>
+            <Cover book={b} size="s" />
             <div className="book-row-content">
               <div className="card-title book-title">{b.work.canonicalTitle}</div>
               <div className="meta prose">

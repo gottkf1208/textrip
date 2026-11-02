@@ -37,6 +37,8 @@ export interface Edition extends Base {
   publishedDate?: string | null;
   volumeLabel?: string | null;
   coverUrl?: string | null;
+  /** 사진 인식으로 넣은 책: 내 사진에서 잘라 낸 책등 (작은 JPEG data URL) */
+  spineImage?: string | null;
   translators?: string[];
   /** 권마다 저자가 다를 때 */
   editionAuthors?: string[];

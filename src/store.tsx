@@ -38,6 +38,7 @@ export interface NewBookInput {
   publishedDate?: string | null;
   language?: string | null;
   coverUrl?: string | null;
+  spineImage?: string | null;
   category?: Work['category'];
   source: Edition['metadataSource'];
   /** 이미 있는 작품에 판본으로 붙일 때 */
@@ -89,6 +90,12 @@ const baseRecord = (id = uid()) => ({ id, createdAt: now(), updatedAt: now(), sc
 
 function readMode(): DbMode {
   try {
+    // QR로 연 주소(?sample=1)는 샘플 책장으로 보여 줘요
+    if (new URLSearchParams(location.search).get('sample') === '1') {
+      localStorage.setItem(MODE_KEY, 'sample');
+      history.replaceState(null, '', location.pathname + location.hash);
+      return 'sample';
+    }
     return localStorage.getItem(MODE_KEY) === 'sample' ? 'sample' : 'user';
   } catch {
     return 'user';
@@ -274,6 +281,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             publishedDate: item.publishedDate ?? null,
             volumeLabel: item.volumeLabel?.trim() || null,
             coverUrl: item.coverUrl ?? null,
+            spineImage: item.spineImage ?? null,
             translators: [],
             metadataSource: item.source,
           };
