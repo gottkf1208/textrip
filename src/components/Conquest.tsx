@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useStore } from '../store';
 import { computeConquest, formatYear } from '../lib/conquest';
 import { hrefFor } from '../lib/util';
+import Passport from './Passport';
 
 export default function Conquest() {
   const { books, data } = useStore();
@@ -15,6 +16,8 @@ export default function Conquest() {
         책으로 다녀온 세계
       </h1>
       <p className="lede">내 책장에 기록한 장소와 시대만으로 계산해요. 아직 근거를 확인하지 않은 연결도 정복지에 포함되니, 상세에서 근거 상태를 함께 봐 주세요.</p>
+
+      <Passport missingContinents={c.missingContinents} countries={c.countries.length} continents={c.continents.size} oldest={c.oldest} newest={c.newest} />
 
       <dl className="stat-grid">
         <div>
