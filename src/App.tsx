@@ -53,8 +53,8 @@ export default function App() {
               <button type="button" className="action small" onClick={async () => {
                 const n = await copySampleToUser();
                 toast({ message: n ? `샘플 ${n}편을 내 기록으로 가져왔어요` : '이미 모두 내 기록에 있어요' });
-              }}><span className="sb-long">내 기록으로 </span>가져오기</button>
-              <button type="button" className="action small ghost" onClick={() => switchMode('user')}><span className="sb-long">내 기록으로 </span>돌아가기</button>
+              }}><span><span className="sb-long">내 기록으로 </span>가져오기</span></button>
+              <button type="button" className="action small ghost" onClick={() => switchMode('user')}><span><span className="sb-long">내 기록으로 </span>돌아가기</span></button>
             </span>
           </div>
         )}
